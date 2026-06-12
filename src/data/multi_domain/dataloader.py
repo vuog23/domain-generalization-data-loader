@@ -2,14 +2,10 @@ import torch
 from pathlib import Path
 from torch.utils.data import DataLoader, Subset
 
-from src.data.nicopp_dataset import NICOPPDataset
+from src.data.multi_domain.dataset import MultiDomainDataset
 
 
 class InfiniteDataLoader:
-    """
-    DomainBed-style infinite loader.
-    Each source domain has its own InfiniteDataLoader.
-    """
     def __init__(
         self,
         dataset,
@@ -103,7 +99,7 @@ def split_indices(n, val_ratio=0.2, seed=42):
     return train_indices, val_indices
 
 
-def make_domainbed_loaders(
+def make_multi_domain_loaders(
     root_path,
     target_domain_group,
     source_domain_groups=None,
@@ -116,22 +112,7 @@ def make_domainbed_loaders(
     seed=42,
     num_workers=2,
 ):
-    """
-    DomainBed-style loader builder.
 
-    Returns:
-        source_train_loaders: list of infinite loaders, one per source real domain
-        source_val_loaders: list of val loaders, one per source real domain
-        test_loader: target test loader
-        class_to_idx: label mapping
-        source_env_names: names of source environments
-
-    Important:
-        batch_size=32 means 32 images per source domain.
-
-        If you have 4 source real domains:
-            total train batch = 32 * 4 = 128
-    """
     root_path = Path(root_path)
 
     all_domain_groups = sorted([
@@ -171,7 +152,7 @@ def make_domainbed_loaders(
         )
 
         for real_domain in real_domains:
-            train_full = NICOPPDataset(
+            train_full = MultiDomainDataset(
                 root_path=root_path,
                 domain_groups=[domain_group],
                 splits=source_splits,
@@ -180,7 +161,7 @@ def make_domainbed_loaders(
                 transform=train_transform,
             )
 
-            val_full = NICOPPDataset(
+            val_full = MultiDomainDataset(
                 root_path=root_path,
                 domain_groups=[domain_group],
                 splits=source_splits,
@@ -233,7 +214,7 @@ def make_domainbed_loaders(
     if len(source_train_loaders) == 0:
         raise ValueError("No source train loaders were created.")
 
-    test_dataset = NICOPPDataset(
+    test_dataset = MultiDomainDataset(
         root_path=root_path,
         domain_groups=[target_domain_group],
         splits=target_splits,

@@ -3,7 +3,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 
 
-class NICOPPDataset(Dataset):
+class MultiDomainDataset(Dataset):
     def __init__(
         self,
         root_path,
