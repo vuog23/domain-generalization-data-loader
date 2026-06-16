@@ -1,5 +1,6 @@
-DomainBed-v2/
 HAINGU/
 papers/
 datasets/
 **/__pycache__/
+notebooks/**
+!notebooks/data_loader_usage.ipynb
